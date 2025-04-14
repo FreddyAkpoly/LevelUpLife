@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require("body-parser");
 const session = require('express-session');
+require('dotenv').config();
 
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
@@ -15,12 +16,13 @@ app.use(session({
     cookie: { secure: false } // set to true if using HTTPS
 }));
 
+
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'Quests',
-});
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
+  });
 
 connection.connect((err) => {
     if (err) {
@@ -197,9 +199,10 @@ app.get('/api/login/:username', (req, res)=>{
 });
 
 
-app.listen(3000, () => {
-    // console.log("Watching the port");
-})
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 // connection.query('SELECT * FROM users', (err, results) => {
 //     if (err) {
