@@ -10,7 +10,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
 app.use(session({
-    secret: 'your-secret-key', // replace with a strong secret in production
+    secret: 'your-secret-key', 
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false } // set to true if using HTTPS
@@ -210,11 +210,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-// connection.query('SELECT * FROM users', (err, results) => {
-//     if (err) {
-//       console.error('Error executing query:', err);
-//       return;
-//     }
-//     console.log('Query results:', results);
-//   });
