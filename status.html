@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Status Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/status.css">
+</head>
+<body>
+
+<div class="status-page">
+    <h2>Player Status</h2>
+
+    <div class="stat">
+        <span>🎨 Creativity <span class="value" id="creativity_value">0%</span></span>
+        <div class="bar">
+            <div class="fill creativity" id="creativity_bar" style="width: 0%;"></div>
+        </div>
+    </div>
+    
+    <div class="stat">
+        <span>❤️ Health <span class="value" id="health_value">0%</span></span>
+        <div class="bar">
+            <div class="fill health" id="health_bar" style="width: 0%;"></div>
+        </div>
+    </div>
+    
+    <div class="stat">
+        <span>🍞 Food <span class="value" id="food_value">0%</span></span>
+        <div class="bar">
+            <div class="fill food" id="food_bar" style="width: 0%;"></div>
+        </div>
+    </div>
+    
+    <div class="stat">
+        <span>🧠 Mental <span class="value" id="mental_value">0%</span></span>
+        <div class="bar">
+            <div class="fill mental" id="mental_bar" style="width: 0%;"></div>
+        </div>
+    </div>
+    
+    <div class="stat">
+        <span>🤝 Social <span class="value" id="social_value">0%</span></span>
+        <div class="bar">
+            <div class="fill social" id="social_bar" style="width: 0%;"></div>
+        </div>
+    </div>
+    
+
+    <button class="nav-btn" id = "view_quests">View Quests</button>
+</div>
+
+<script src="/status.js" type="text/javascript"></script>
+
+</body>
+</html>
