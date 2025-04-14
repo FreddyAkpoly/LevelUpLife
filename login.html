@@ -6,7 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/login.css">
 </head>
+
 <body>
+  <nav class="navbar">
+    <div class="navbar-logo">QuestLog</div>
+    <ul class="navbar-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="#" class="active">Login</a></li>
+    </ul>
+  </nav>
 
   <div class="login-container">
     <h2>Player Login</h2>
@@ -17,7 +25,7 @@
       <label for="password">Password</label>
       <input type="password" id="password" name="password" required>
 
-      <button type="button" id= "submit">Log In</button>
+      <button type="button" id="submit">Log In</button>
     </form>
 
     <p id="login_error" class="error-message"></p>

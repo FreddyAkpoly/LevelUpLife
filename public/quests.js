@@ -26,9 +26,9 @@ const userID = pathParts[pathParts.length - 1];
     window.location.href = `/status/${userID}`;
   };
 
-  document.getElementById("back_to_login").onclick = async function () {
-    window.location.href = `/`;
-  };
+  // document.getElementById("back_to_login").onclick = async function () {
+  //   window.location.href = `/`;
+  // };
 
 
   fetch('/api/quests')
