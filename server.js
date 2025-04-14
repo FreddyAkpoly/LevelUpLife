@@ -25,8 +25,11 @@ const connection = mysql.createConnection({
     ssl: {
         minVersion: 'TLSv1.2',
         rejectUnauthorized: false        // necessary for self-signed certs on TiDB Cloud
-      }
-  });
+    },
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
 
 connection.connect((err) => {
     if (err) {
@@ -81,7 +84,7 @@ app.get('/api/status', (req, res) => {
 app.get('/api/status/:userid', (req, res) => {
     const userId = req.params.userid;
     const query = 'SELECT * FROM users WHERE user_id = ?';
-    connection.query(query,[userId], (err, results) => {
+    connection.query(query, [userId], (err, results) => {
         if (err) {
             console.error('Error executing query:', err);
             return res.status(500).json({ error: 'Database query failed' });
@@ -184,8 +187,8 @@ app.get('/api/login/:username/:password', (req, res) => {
     });
 });
 
-app.get('/api/login/:username', (req, res)=>{
-    
+app.get('/api/login/:username', (req, res) => {
+
     const username = req.params.username;
     const query = 'SELECT user_id FROM users WHERE username = ?';
     connection.query(query, [username], (err, results) => {
@@ -197,7 +200,7 @@ app.get('/api/login/:username', (req, res)=>{
             return res.status(404).json({ error: 'User not found' });
         }
         console.log(results);
-    
+
         res.json(results[0].user_id);
     });
 });
@@ -205,7 +208,7 @@ app.get('/api/login/:username', (req, res)=>{
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
 
 // connection.query('SELECT * FROM users', (err, results) => {
