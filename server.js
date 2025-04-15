@@ -41,28 +41,28 @@ connection.connect((err) => {
 
 
 app.get('/quests/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'quests.html'));
+    res.sendFile(path.join(__dirname, 'public/html/quests.html'));
 });
 
 app.get('/quests/:username', (req, res) => {
-    res.sendFile(path.join(__dirname, 'quests.html'));
+    res.sendFile(path.join(__dirname, 'public/html/quests.html'));
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'main.html'));
+    res.sendFile(path.join(__dirname, 'public/html/main.html'));
 });
 
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'login.html'));
+    res.sendFile(path.join(__dirname, 'public/html/login.html'));
 });
 
 app.get('/status', (req, res) => {
-    res.sendFile(path.join(__dirname, 'status.html'));
+    res.sendFile(path.join(__dirname, 'public/html/status.html'));
 });
 
 
 app.get('/status/:userID', (req, res) => {
-    res.sendFile(path.join(__dirname, 'status.html'));
+    res.sendFile(path.join(__dirname, 'public/html/status.html'));
 });
 
 
