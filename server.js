@@ -75,6 +75,29 @@ app.get('/api/quests', (req, res) => {
         res.json(results);
     });
 });
+
+app.get('/api/quests/:questId', (req, res) => {
+    const { questId } = req.params;  // Get questId from the URL parameters
+
+    const query = 'SELECT * FROM quest_list WHERE quest_id = ?';
+
+    connection.query(query, [questId], (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Quest not found' });
+        }
+
+        res.json(results[0]);  // Return the first (and only) result
+    });
+});
+
+
+
+
 app.get('/api/status', (req, res) => {
     connection.query('SELECT * FROM users', (err, results) => {
         if (err) {
@@ -126,28 +149,55 @@ app.put('/api/status/:stat', (req, res) => {
     });
 });
 
-app.get('/api/quest_status/:userId', (req, res) => {
-    const userId = req.params.userId;
+// app.get('/api/quest_status/:userId', (req, res) => {
+//     const userId = req.params.userId;
 
-    const query = 'SELECT quest_status FROM users WHERE user_id = ?';
+//     const query = 'SELECT quest_status FROM users WHERE user_id = ?';
 
-    connection.query(query, [userId], (err, results) => {
+//     connection.query(query, [userId], (err, results) => {
+//         if (err) {
+//             console.error('Error fetching completed quests:', err);
+//             return res.status(500).json({ error: 'Database query failed' });
+//         }
+
+
+//         if (results.length === 0) {
+//             return res.status(404).json({ error: 'User not found' });
+//         }
+
+//         // Parse JSON before sending (optional, depending on frontend needs)
+//         const quest_status = results[0].quest_status;
+
+//         res.json({ quest_status: quest_status });
+//     });
+// });
+
+app.get('/api/quest_status/:userId/:questId', (req, res) => {
+    const { userId, questId } = req.params;
+
+    const query = `
+        SELECT is_completed
+        FROM user_quest_status
+        WHERE user_id = ? AND quest_id = ?
+    `;
+        console.log(questId);
+    
+
+    connection.query(query, [userId, questId], (err, results) => {
+        console.log(results);
         if (err) {
-            console.error('Error fetching completed quests:', err);
+            console.error('Error checking quest status:', err);
             return res.status(500).json({ error: 'Database query failed' });
         }
-
-
         if (results.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+            // User hasn't started or completed this quest
+            return res.json({ completed: false });
         }
 
-        // Parse JSON before sending (optional, depending on frontend needs)
-        const quest_status = results[0].quest_status;
-
-        res.json({ quest_status: quest_status });
+        res.json({ completed: !!results[0].is_completed});
     });
 });
+
 
 app.put('/api/quest_status/complete_quest/:userId/:day', (req, res) => {
     const userId = req.params.userId;
@@ -172,6 +222,30 @@ app.put('/api/quest_status/complete_quest/:userId/:day', (req, res) => {
         res.json({ message: `Quest day ${day} marked as completed.` });
     });
 });
+
+app.put('/api/quest_status/complete_quest/:userId/:questId', (req, res) => {
+    const { userId, questId } = req.params;
+
+    const query = `
+        INSERT INTO user_quest_status (user_id, quest_id, completed)
+        VALUES (?, ?, true)
+        ON DUPLICATE KEY UPDATE completed = true;
+    `;
+
+    connection.query(query, [userId, questId], (err, results) => {
+        if (err) {
+            console.error('Error updating quest status:', err);
+            return res.status(500).json({ error: 'Database update failed' });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ error: 'User or quest not found' });
+        }
+
+        res.json({ message: `Quest ${questId} marked as completed for user ${userId}.` });
+    });
+});
+
 
 
 app.get('/api/login/:username/:password', (req, res) => {
