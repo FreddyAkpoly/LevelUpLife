@@ -121,14 +121,15 @@ app.get('/api/status/:userid', (req, res) => {
 });
 
 
-app.put('/api/status/:stat', (req, res) => {
-    const { userId } = req.body;
+app.put('/api/status/:userID/:stat/:new_value', (req, res) => {
+    
+    const userId  = req.params.userID;
     const stat = req.params.stat;
-    const newValue = req.body[stat];
-
+    const newValue = req.params.new_value;
+    console.log("UPDATED VAL " + newValue);
     // Whitelist allowed stats to prevent SQL injection
-    const allowedStats = ['creativity', 'health', 'food', 'mental', 'social'];
-
+    const allowedStats = ['Creativity', 'Health', 'Food', 'Mental', 'Social'];
+   
     if (!allowedStats.includes(stat)) {
         return res.status(400).json({ error: 'Invalid stat type' });
     }
@@ -199,37 +200,37 @@ app.get('/api/quest_status/:userId/:questId', (req, res) => {
 });
 
 
-app.put('/api/quest_status/complete_quest/:userId/:day', (req, res) => {
-    const userId = req.params.userId;
-    const day = req.params.day; // This should be a string for the JSON key
+// app.put('/api/quest_status/complete_quest/:userId/:day', (req, res) => {
+//     const userId = req.params.userId;
+//     const day = req.params.day; // This should be a string for the JSON key
 
-    const query = `
-      UPDATE Quests.users
-      SET quest_status = JSON_SET(quest_status, '$."${day}"', true)
-      WHERE user_id = ?;
-    `;
+//     const query = `
+//       UPDATE Quests.users
+//       SET quest_status = JSON_SET(quest_status, '$."${day}"', true)
+//       WHERE user_id = ?;
+//     `;
 
-    connection.query(query, [userId], (err, results) => {
-        if (err) {
-            console.error('Error updating quest status:', err);
-            return res.status(500).json({ error: 'Database update failed' });
-        }
+//     connection.query(query, [userId], (err, results) => {
+//         if (err) {
+//             console.error('Error updating quest status:', err);
+//             return res.status(500).json({ error: 'Database update failed' });
+//         }
 
-        if (results.affectedRows === 0) {
-            return res.status(404).json({ error: 'User not found' });
-        }
+//         if (results.affectedRows === 0) {
+//             return res.status(404).json({ error: 'User not found' });
+//         }
 
-        res.json({ message: `Quest day ${day} marked as completed.` });
-    });
-});
+//         res.json({ message: `Quest day ${day} marked as completed.` });
+//     });
+// });
 
 app.put('/api/quest_status/complete_quest/:userId/:questId', (req, res) => {
     const { userId, questId } = req.params;
 
     const query = `
-        INSERT INTO user_quest_status (user_id, quest_id, completed)
+        INSERT INTO user_quest_status (user_id, quest_id, is_completed)
         VALUES (?, ?, true)
-        ON DUPLICATE KEY UPDATE completed = true;
+        ON DUPLICATE KEY UPDATE is_completed = true;
     `;
 
     connection.query(query, [userId, questId], (err, results) => {
