@@ -281,7 +281,7 @@ app.put('/api/register/:username/:password', async (req, res) => {
     const insertUser = () => {
         const id = generateId();
 
-        const checkQuery = `SELECT id FROM users WHERE id = ?`;
+        const checkQuery = `SELECT user_id FROM users WHERE user_id = ?`;
         connection.query(checkQuery, [id], (err, results) => {
             if (err) {
                 console.error('Error checking ID:', err);
@@ -294,7 +294,7 @@ app.put('/api/register/:username/:password', async (req, res) => {
             } else {
                 // ID is unique, insert user
                 const insertQuery = `
-                    INSERT INTO users (id, username, password_hash)
+                    INSERT INTO users (user_id, username, password_hash)
                     VALUES (?, ?, ?)
                 `;
                 connection.query(insertQuery, [id, username, password], (err, results) => {
