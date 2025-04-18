@@ -1,7 +1,7 @@
 window.addEventListener("load", () => {
   const date = new Date();
-  //let quest_id = new Date().getDate() - 1;
-  let quest_id = 3;
+  let quest_id = new Date().getDate() - 1;
+  //let quest_id = 3;
   const formattedDate = date.toDateString();
   let todays_quest_type;
   document.getElementById("time").innerText = formattedDate;

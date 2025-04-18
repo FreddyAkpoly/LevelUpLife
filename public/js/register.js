@@ -11,12 +11,9 @@ window.addEventListener("load", () => {
         if (username_available) {
             const add_user = await register(username, password);
         }
-
-        // if (success) {
-        //     const user_id = await get_user_id(username);
-        //     window.location.href = `/quests/${user_id}`;
-        // } else {
-        // }
+        else{
+            console.log("username taken");
+        }
     };
 
     async function check_username(username) {
