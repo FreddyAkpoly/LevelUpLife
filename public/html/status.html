@@ -1,63 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Status Page</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/status.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="navbar-logo">QuestLog</div>
         <ul class="navbar-links">
-          <li><a href="/">Home</a></li>
-          <li><a href="/login" class="active">Login</a></li>
+            <li><a href="/">Home</a></li>
+            <li><a href="/register">Register</a></li>
+            <li><a href="/login">Login</a></li>
         </ul>
-      </nav>
+    </nav>
 
-<div class="status-page">
-    <h2>Player Status</h2>
+    <div class="status-page">
+        <h2>Player Status</h2>
 
-    <div class="stat">
-        <span>🎨 Creativity <span class="value" id="Creativity_value">0%</span></span>
-        <div class="bar">
-            <div class="fill creativity" id="Creativity_bar" style="width: 0%;"></div>
+        <div class="stat">
+            <span>🎨 Creativity <span class="value" id="Creativity_value">0%</span></span>
+            <div class="bar">
+                <div class="fill creativity" id="Creativity_bar" style="width: 0%;"></div>
+            </div>
         </div>
-    </div>
-    
-    <div class="stat">
-        <span>❤️ Health <span class="value" id="Health_value">0%</span></span>
-        <div class="bar">
-            <div class="fill health" id="Health_bar" style="width: 0%;"></div>
-        </div>
-    </div>
-    
-    <div class="stat">
-        <span>🍞 Food <span class="value" id="Food_value">0%</span></span>
-        <div class="bar">
-            <div class="fill food" id="Food_bar" style="width: 0%;"></div>
-        </div>
-    </div>
-    
-    <div class="stat">
-        <span>🧠 Mental <span class="value" id="Mental_value">0%</span></span>
-        <div class="bar">
-            <div class="fill mental" id="Mental_bar" style="width: 0%;"></div>
-        </div>
-    </div>
-    
-    <div class="stat">
-        <span>🤝 Social <span class="value" id="Social_value">0%</span></span>
-        <div class="bar">
-            <div class="fill social" id="Social_bar" style="width: 0%;"></div>
-        </div>
-    </div>
-    
 
-    <button class="nav-btn" id = "view_quests">View Quests</button>
-</div>
+        <div class="stat">
+            <span>❤️ Health <span class="value" id="Health_value">0%</span></span>
+            <div class="bar">
+                <div class="fill health" id="Health_bar" style="width: 0%;"></div>
+            </div>
+        </div>
 
-<script src="../js/status.js" type="text/javascript"></script>
+        <div class="stat">
+            <span>🍞 Food <span class="value" id="Food_value">0%</span></span>
+            <div class="bar">
+                <div class="fill food" id="Food_bar" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            <span>🧠 Mental <span class="value" id="Mental_value">0%</span></span>
+            <div class="bar">
+                <div class="fill mental" id="Mental_bar" style="width: 0%;"></div>
+            </div>
+        </div>
+
+        <div class="stat">
+            <span>🤝 Social <span class="value" id="Social_value">0%</span></span>
+            <div class="bar">
+                <div class="fill social" id="Social_bar" style="width: 0%;"></div>
+            </div>
+        </div>
+
+
+        <button class="nav-btn" id="view_quests">View Quests</button>
+    </div>
+
+    <script src="../js/status.js" type="text/javascript"></script>
 
 </body>
+
 </html>

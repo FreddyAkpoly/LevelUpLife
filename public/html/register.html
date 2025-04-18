@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/register.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-logo">QuestLog</div>
+        <ul class="navbar-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/register">Register</a></li>
+            <li><a href="/login">Login</a></li>
+        </ul>
+    </nav>
+
+    <div class="login-container">
+        <h2>Player Register</h2>
+        <form id="login_form">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="button" id="submit">Register</button>
+        </form>
+
+        <p id="register" class="error-message"></p>
+    </div>
+
+    <script src="../js/register.js"></script>
+</body>
+
+</html>

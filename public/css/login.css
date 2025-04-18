@@ -61,6 +61,7 @@ body {
     border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    font-family: 'Papyrus', 'Fantasy', serif;
   }
   
   button:hover {

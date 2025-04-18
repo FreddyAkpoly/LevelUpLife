@@ -10,7 +10,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
 app.use(session({
-    secret: 'your-secret-key', 
+    secret: 'your-secret-key',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false } // set to true if using HTTPS
@@ -40,9 +40,9 @@ connection.connect((err) => {
 });
 
 
-app.get('/quests/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/html/quests.html'));
-});
+// app.get('/quests/', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public/html/quests.html'));
+// });
 
 app.get('/quests/:username', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/html/quests.html'));
@@ -56,9 +56,13 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/html/login.html'));
 });
 
-app.get('/status', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/html/status.html'));
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/html/register.html'));
 });
+
+// app.get('/status', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'public/html/status.html'));
+// });
 
 
 app.get('/status/:userID', (req, res) => {
@@ -66,15 +70,15 @@ app.get('/status/:userID', (req, res) => {
 });
 
 
-app.get('/api/quests', (req, res) => {
-    connection.query('SELECT * FROM DailyQuest', (err, results) => {
-        if (err) {
-            console.error('Error executing query:', err);
-            return res.status(500).json({ error: 'Database query failed' });
-        }
-        res.json(results);
-    });
-});
+// app.get('/api/quests', (req, res) => {
+//     connection.query('SELECT * FROM DailyQuest', (err, results) => {
+//         if (err) {
+//             console.error('Error executing query:', err);
+//             return res.status(500).json({ error: 'Database query failed' });
+//         }
+//         res.json(results);
+//     });
+// });
 
 app.get('/api/quests/:questId', (req, res) => {
     const { questId } = req.params;  // Get questId from the URL parameters
@@ -98,15 +102,15 @@ app.get('/api/quests/:questId', (req, res) => {
 
 
 
-app.get('/api/status', (req, res) => {
-    connection.query('SELECT * FROM users', (err, results) => {
-        if (err) {
-            console.error('Error executing query:', err);
-            return res.status(500).json({ error: 'Database query failed' });
-        }
-        res.json(results);
-    });
-});
+// app.get('/api/status', (req, res) => {
+//     connection.query('SELECT * FROM users', (err, results) => {
+//         if (err) {
+//             console.error('Error executing query:', err);
+//             return res.status(500).json({ error: 'Database query failed' });
+//         }
+//         res.json(results);
+//     });
+// });
 
 app.get('/api/status/:userid', (req, res) => {
     const userId = req.params.userid;
@@ -122,14 +126,14 @@ app.get('/api/status/:userid', (req, res) => {
 
 
 app.put('/api/status/:userID/:stat/:new_value', (req, res) => {
-    
-    const userId  = req.params.userID;
+
+    const userId = req.params.userID;
     const stat = req.params.stat;
     const newValue = req.params.new_value;
     console.log("UPDATED VAL " + newValue);
     // Whitelist allowed stats to prevent SQL injection
     const allowedStats = ['Creativity', 'Health', 'Food', 'Mental', 'Social'];
-   
+
     if (!allowedStats.includes(stat)) {
         return res.status(400).json({ error: 'Invalid stat type' });
     }
@@ -181,8 +185,8 @@ app.get('/api/quest_status/:userId/:questId', (req, res) => {
         FROM user_quest_status
         WHERE user_id = ? AND quest_id = ?
     `;
-        console.log(questId);
-    
+    console.log(questId);
+
 
     connection.query(query, [userId, questId], (err, results) => {
         console.log(results);
@@ -195,7 +199,7 @@ app.get('/api/quest_status/:userId/:questId', (req, res) => {
             return res.json({ completed: false });
         }
 
-        res.json({ completed: !!results[0].is_completed});
+        res.json({ completed: !!results[0].is_completed });
     });
 });
 
@@ -248,9 +252,8 @@ app.put('/api/quest_status/complete_quest/:userId/:questId', (req, res) => {
 });
 
 
-
+// ask db for password of user, return if passed in password matches db password
 app.get('/api/login/:username/:password', (req, res) => {
-
     const username = req.params.username;
     const password = req.params.password;
     const query = 'SELECT password_hash FROM users WHERE username = ?';
@@ -266,6 +269,47 @@ app.get('/api/login/:username/:password', (req, res) => {
     });
 });
 
+//add new user to db
+app.put('/api/register/:username/:password', (req, res) => {
+    const { username, password } = req.params;
+
+    const query = `
+        INSERT INTO users (username, password_hash)
+        VALUES (?, ?);
+    `;
+
+    connection.query(query, [username, password], (err, results) => {
+        if (err) {
+            console.error('Error updating quest status:', err);
+            return res.status(500).json({ error: 'Database update failed' });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ error: 'User or quest not found' });
+        }
+        res.json({ message: `user added` });
+    });
+});
+
+// ask db if username is available 
+app.get('/api/register/:username', (req, res) => {
+    const username = req.params.username;
+    const query = 'SELECT username FROM users WHERE username = ?';
+    connection.query(query, [username], (err, results) => {
+        if (err) {
+            console.error('Error fetching completed quests:', err);
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+
+        if (results.length === 0) {
+
+        }
+        res.json(results.length === 0);
+    });
+});
+
+
+// Ask db for user id for username
 app.get('/api/login/:username', (req, res) => {
 
     const username = req.params.username;
