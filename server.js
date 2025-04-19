@@ -9,13 +9,19 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+app.set("trust proxy", 1); // needed for HTTPS on render
+
+
 app.use(session({
     secret: process.env.SECRET,
     saveUninitialized: false,
     resave: false,
     cookie: {
-        maxAge: 60000 * 60,
-        secure: false 
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
+        maxAge: 1000 * 60 * 60 // 1 hour
     }
 }));
 
