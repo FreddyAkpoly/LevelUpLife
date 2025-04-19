@@ -3,10 +3,10 @@ window.addEventListener("load", () => {
 const userID = pathParts[pathParts.length - 1];
 
 document.getElementById("view_quests").onclick = async function () {
-  window.location.href = `/quests/${userID}`;
+  window.location.href = `/quests`;
 };
 
-  fetch(`/api/status/${userID}`)
+  fetch('/api/status')
     .then(response => response.json())
     .then(data => {
       console.log("Received User data:", data);

@@ -1,5 +1,6 @@
 window.addEventListener("load", () => {
     document.getElementById("submit").onclick = async function () {
+
         const username = document.getElementById("username").value.trim();
         const password = document.getElementById("password").value;
 
@@ -8,11 +9,10 @@ window.addEventListener("load", () => {
         }
 
         const success = await login(username, password);
-        console.log("Login successful:", success);
 
         if (success) {
-            const user_id = await get_user_id(username);
-            window.location.href = `/quests/${user_id}`;
+            createSession(username, password);
+            window.location.href = `/quests`;
         } else {
         }
     };
@@ -29,13 +29,15 @@ window.addEventListener("load", () => {
         }
     }
 
-    async function get_user_id(username) {
+    async function createSession(username, password) {
         try {
-            const response = await fetch(`/api/login/${username}`);
-            const data = await response.json();
-            return data;
+            fetch(`/api/auth/${username}/${password}`, {
+                method: "POST",
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              });
         } catch (error) {
-            console.error("Get user ID error:", error);
             return null;
         }
     }

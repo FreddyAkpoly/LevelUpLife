@@ -10,10 +10,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
 app.use(session({
-    secret: 'your-secret-key',
-    resave: false,
+    secret: process.env.SECRET,
     saveUninitialized: false,
-    cookie: { secure: false } // set to true if using HTTPS
+    resave: false,
+    cookie: {
+        maxAge: 60000 * 60,
+        secure: false // set to true if using HTTPS
+    }
 }));
 
 
@@ -39,17 +42,23 @@ connection.connect((err) => {
     console.log('Connected to MySQL database!');
 });
 
-
-// app.get('/quests/', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'public/html/quests.html'));
-// });
-
-app.get('/quests/:username', (req, res) => {
+//temp sessions change 
+app.get('/quests', (req, res) => {
+    console.log(req.session);
+    console.log(req.session.id);
+    req.session.visited = true;
     res.sendFile(path.join(__dirname, 'public/html/quests.html'));
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public/html/main.html'));
+    if (req.session.user) {
+        console.log(req.session.user);
+        res.sendFile(path.join(__dirname, 'public/html/quests.html'));
+    }
+    else {
+        res.sendFile(path.join(__dirname, 'public/html/main.html'));
+    }
+
 });
 
 app.get('/login', (req, res) => {
@@ -60,25 +69,12 @@ app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/html/register.html'));
 });
 
-// app.get('/status', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'public/html/status.html'));
-// });
 
 
-app.get('/status/:userID', (req, res) => {
+app.get('/status', (req, res) => {
     res.sendFile(path.join(__dirname, 'public/html/status.html'));
 });
 
-
-// app.get('/api/quests', (req, res) => {
-//     connection.query('SELECT * FROM DailyQuest', (err, results) => {
-//         if (err) {
-//             console.error('Error executing query:', err);
-//             return res.status(500).json({ error: 'Database query failed' });
-//         }
-//         res.json(results);
-//     });
-// });
 
 app.get('/api/quests/:questId', (req, res) => {
     const { questId } = req.params;  // Get questId from the URL parameters
@@ -95,34 +91,24 @@ app.get('/api/quests/:questId', (req, res) => {
             return res.status(404).json({ error: 'Quest not found' });
         }
 
-        res.json(results[0]);  // Return the first (and only) result
+        res.json(results[0]);  // Return the first (and only) result 
     });
 });
 
 
-
-
-// app.get('/api/status', (req, res) => {
-//     connection.query('SELECT * FROM users', (err, results) => {
-//         if (err) {
-//             console.error('Error executing query:', err);
-//             return res.status(500).json({ error: 'Database query failed' });
-//         }
-//         res.json(results);
-//     });
-// });
-
-app.get('/api/status/:userid', (req, res) => {
-    const userId = req.params.userid;
+app.get('/api/status', (req, res) => {
     const query = 'SELECT * FROM users WHERE user_id = ?';
-    connection.query(query, [userId], (err, results) => {
+    console.log(req.session.user.user_id);
+    connection.query(query, [req.session.user.user_id], (err, results) => {
         if (err) {
             console.error('Error executing query:', err);
             return res.status(500).json({ error: 'Database query failed' });
         }
+        console.log(results[0]);
         res.json(results);
     });
 });
+
 
 
 app.put('/api/status/:userID/:stat/:new_value', (req, res) => {
@@ -131,7 +117,6 @@ app.put('/api/status/:userID/:stat/:new_value', (req, res) => {
     const stat = req.params.stat;
     const newValue = req.params.new_value;
     console.log("UPDATED VAL " + newValue);
-    // Whitelist allowed stats to prevent SQL injection
     const allowedStats = ['Creativity', 'Health', 'Food', 'Mental', 'Social'];
 
     if (!allowedStats.includes(stat)) {
@@ -154,31 +139,8 @@ app.put('/api/status/:userID/:stat/:new_value', (req, res) => {
     });
 });
 
-// app.get('/api/quest_status/:userId', (req, res) => {
-//     const userId = req.params.userId;
-
-//     const query = 'SELECT quest_status FROM users WHERE user_id = ?';
-
-//     connection.query(query, [userId], (err, results) => {
-//         if (err) {
-//             console.error('Error fetching completed quests:', err);
-//             return res.status(500).json({ error: 'Database query failed' });
-//         }
-
-
-//         if (results.length === 0) {
-//             return res.status(404).json({ error: 'User not found' });
-//         }
-
-//         // Parse JSON before sending (optional, depending on frontend needs)
-//         const quest_status = results[0].quest_status;
-
-//         res.json({ quest_status: quest_status });
-//     });
-// });
-
-app.get('/api/quest_status/:userId/:questId', (req, res) => {
-    const { userId, questId } = req.params;
+app.get('/api/quest_status/:questId', (req, res) => {
+    const {questId } = req.params;
 
     const query = `
         SELECT is_completed
@@ -188,7 +150,7 @@ app.get('/api/quest_status/:userId/:questId', (req, res) => {
     console.log(questId);
 
 
-    connection.query(query, [userId, questId], (err, results) => {
+    connection.query(query, [req.session.user.user_id, questId], (err, results) => {
         console.log(results);
         if (err) {
             console.error('Error checking quest status:', err);
@@ -203,33 +165,8 @@ app.get('/api/quest_status/:userId/:questId', (req, res) => {
     });
 });
 
-
-// app.put('/api/quest_status/complete_quest/:userId/:day', (req, res) => {
-//     const userId = req.params.userId;
-//     const day = req.params.day; // This should be a string for the JSON key
-
-//     const query = `
-//       UPDATE Quests.users
-//       SET quest_status = JSON_SET(quest_status, '$."${day}"', true)
-//       WHERE user_id = ?;
-//     `;
-
-//     connection.query(query, [userId], (err, results) => {
-//         if (err) {
-//             console.error('Error updating quest status:', err);
-//             return res.status(500).json({ error: 'Database update failed' });
-//         }
-
-//         if (results.affectedRows === 0) {
-//             return res.status(404).json({ error: 'User not found' });
-//         }
-
-//         res.json({ message: `Quest day ${day} marked as completed.` });
-//     });
-// });
-
-app.put('/api/quest_status/complete_quest/:userId/:questId', (req, res) => {
-    const { userId, questId } = req.params;
+app.put('/api/quest_status/complete_quest/:questId', (req, res) => {
+    const {questId } = req.params;
 
     const query = `
         INSERT INTO user_quest_status (user_id, quest_id, is_completed)
@@ -237,7 +174,7 @@ app.put('/api/quest_status/complete_quest/:userId/:questId', (req, res) => {
         ON DUPLICATE KEY UPDATE is_completed = true;
     `;
 
-    connection.query(query, [userId, questId], (err, results) => {
+    connection.query(query, [req.session.user.user_id, questId], (err, results) => {
         if (err) {
             console.error('Error updating quest status:', err);
             return res.status(500).json({ error: 'Database update failed' });
@@ -269,29 +206,30 @@ app.get('/api/login/:username/:password', (req, res) => {
     });
 });
 
-/* add new user to db [OLD]
-app.put('/api/register/:username/:password', (req, res) => {
-    const { username, password } = req.params;
+app.post("/api/auth/:username/:password", (req, res) => {
+    const username = req.params.username;
+    const password = req.params.password;
 
-    const query = `
-        INSERT INTO users (username, password_hash)
-        VALUES (?, ?);
-    `;
-
-    connection.query(query, [username, password], (err, results) => {
+    const query = 'SELECT * FROM users WHERE username = ?';
+    connection.query(query, [username], (err, results) => {
         if (err) {
-            console.error('Error updating quest status:', err);
-            return res.status(500).json({ error: 'Database update failed' });
+            console.error('Error fetching completed quests:', err);
+            return res.status(500).json({ error: 'Database query failed' });
         }
-
-        if (results.affectedRows === 0) {
-            return res.status(404).json({ error: 'User or quest not found' });
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
         }
-        res.json({ message: `user added` });
+        if (results[0].password_hash !== password) {
+            return res.status(404).json({ error: 'invalid login info' });
+        }
+        req.session.user = results[0];
+        return res.status(200).send(results);
     });
-}); */
+})
 
-
+app.get("/api/auth/status", (req, res) => {
+    return req.session.user ? res.status(200).send(req.session.user) : res.status(401).send({ msg: "Not authenticated" });
+});
 
 
 //  add user to db [NEW]

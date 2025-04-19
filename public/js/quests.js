@@ -24,7 +24,7 @@ window.addEventListener("load", () => {
   };
 
   document.getElementById("view_status").onclick = async function () {
-    window.location.href = `/status/${userID}`;
+    window.location.href = `/status`;
   };
 
   // document.getElementById("back_to_login").onclick = async function () {
@@ -45,23 +45,6 @@ window.addEventListener("load", () => {
       console.error("Error fetching quest:", error);
       document.getElementById("mission").innerText = "Failed to load quest";
     });
-
-  // fetch('/api/quests')
-  //   .then(response => response.json())
-  //   .then(data => {
-  //     //console.log("Received quest data:", data);
-
-  //     if (data.length > 0 && data[QuestDate]) {
-  //       document.getElementById("mission_type").innerText = `${data[QuestDate].quest_type}:` || "Unnamed Type";
-  //     } else {
-  //       document.getElementById("mission_type").innerText = "No quests found";
-  //     }
-  //   })
-  //   .catch(error => {
-  //     console.error("Error fetching quest type:", error);
-  //     document.getElementById("mission_type").innerText = "Failed to load quest type";
-  //   });
-
 
   const complete_quest = (userId, stat, new_value) => {
     fetch(`/api/status/${userId}/${stat}/${new_value}`, {
@@ -86,9 +69,9 @@ window.addEventListener("load", () => {
       });
   };
 
-  const get_current_stat = async (userId, stat) => {
+  const get_current_stat = async (stat) => {
     try {
-      const response = await fetch(`/api/status/${userID}`);
+      const response = await fetch('/api/status');
       const data = await response.json();
       if (data != null) {
         console.log(data[0][stat]);
@@ -103,30 +86,9 @@ window.addEventListener("load", () => {
     }
   };
 
-  // const get_quest_status = async (userID) => {
-  //   try {
-  //     const response = await fetch(`/api/quest_status/${userID}`);
-  //     const data = await response.json();
-  //     const quests = data.quest_status;
-  //     console.log("Full quest_status object:", quests);
-
-  //     const dayKey = (QuestDate + 1).toString();
-  //     if (quests && quests[dayKey] !== undefined) {
-  //       console.log("Quest status on this date:", quests[dayKey]);
-  //       return quests[dayKey];
-  //     } else {
-  //       console.log("No quest data for this date.");
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching completed quests:", error);
-  //     return null;
-  //   }
-  // };  
-
-  const get_quest_status = async (userID, questID) => {
+  const get_quest_status = async (questID) => {
     try {
-      const response = await fetch(`/api/quest_status/${userID}/${questID}`);
+      const response = await fetch(`/api/quest_status/${questID}`);
       const data = await response.json();
       const quests = data.completed;
       console.log("Full quest_status object:", quests);
@@ -144,10 +106,10 @@ window.addEventListener("load", () => {
     }
   };
 
-  const update_complete_quest = (userId, quest_id) => {
+  const update_complete_quest = (quest_id) => {
     console.log(`Updating quest: userId=${userId}, quest_id=${quest_id}`);
 
-    fetch(`/api/quest_status/complete_quest/${userId}/${quest_id}`, {
+    fetch(`/api/quest_status/complete_quest/${quest_id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
