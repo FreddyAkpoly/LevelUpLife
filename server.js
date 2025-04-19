@@ -21,7 +21,7 @@ app.use(session({
     cookie: {
         secure: isProduction,
         sameSite: isProduction ? "none" : "lax",
-        maxAge: 1000 * 60 * 60 // 1 hour
+        maxAge: 1000 * 60 * 60 // 1 hour 
     }
 }));
 
@@ -50,7 +50,7 @@ connection.connect((err) => {
 
 
 app.get('/quests', (req, res) => {
-    req.session.visited = true;
+    console.log("Full session:", req.session);
     res.sendFile(path.join(__dirname, 'public/html/quests.html'));
 });
 
@@ -325,7 +325,7 @@ app.get('/api/login/:username', (req, res) => {
         console.log(results);
 
         res.json(results[0].user_id);
-    });
+    }); 
 });
 
 
