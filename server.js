@@ -15,7 +15,7 @@ app.use(session({
     resave: false,
     cookie: {
         maxAge: 60000 * 60,
-        secure: false // set to true if using HTTPS
+        secure: false 
     }
 }));
 
@@ -42,10 +42,8 @@ connection.connect((err) => {
     console.log('Connected to MySQL database!');
 });
 
-//temp sessions change 
+
 app.get('/quests', (req, res) => {
-    console.log(req.session);
-    console.log(req.session.id);
     req.session.visited = true;
     res.sendFile(path.join(__dirname, 'public/html/quests.html'));
 });
@@ -97,8 +95,12 @@ app.get('/api/quests/:questId', (req, res) => {
 
 
 app.get('/api/status', (req, res) => {
+    // console.log('Session:', req.session.user);
+    if (!req.session.user) {
+        return res.status(401).json({ error: 'User not authenticated' });
+    }
+    console.log('Session:', req.session);
     const query = 'SELECT * FROM users WHERE user_id = ?';
-    console.log(req.session.user.user_id);
     connection.query(query, [req.session.user.user_id], (err, results) => {
         if (err) {
             console.error('Error executing query:', err);
@@ -231,6 +233,7 @@ app.post("/api/auth/:username/:password", (req, res) => {
             user_id: user.user_id,
             username: user.username
         };
+        console.log('Session:', req.session.user);
         return res.status(200).json({ message: 'Login successful', user: req.session.user });
 
     });
@@ -320,7 +323,8 @@ app.get('/api/login/:username', (req, res) => {
 });
 
 
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    //console.log(`Server running on port ${PORT}`);
 });
