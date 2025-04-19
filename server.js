@@ -4,7 +4,7 @@ const path = require('path');
 const bodyParser = require("body-parser");
 const session = require('express-session');
 require('dotenv').config();
-const crypto = require('crypto');
+
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
@@ -269,9 +269,32 @@ app.get('/api/login/:username/:password', (req, res) => {
     });
 });
 
-//add new user to db
+/* add new user to db [OLD]
+app.put('/api/register/:username/:password', (req, res) => {
+    const { username, password } = req.params;
+
+    const query = `
+        INSERT INTO users (username, password_hash)
+        VALUES (?, ?);
+    `;
+
+    connection.query(query, [username, password], (err, results) => {
+        if (err) {
+            console.error('Error updating quest status:', err);
+            return res.status(500).json({ error: 'Database update failed' });
+        }
+
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ error: 'User or quest not found' });
+        }
+        res.json({ message: `user added` });
+    });
+}); */
 
 
+
+
+//  add user to db [NEW]
 app.put('/api/register/:username/:password', async (req, res) => {
     const { username, password } = req.params;
 
@@ -311,7 +334,6 @@ app.put('/api/register/:username/:password', async (req, res) => {
 
     insertUser();
 });
-
 
 // ask db if username is available 
 app.get('/api/register/:username', (req, res) => {
