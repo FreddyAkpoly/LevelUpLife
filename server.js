@@ -219,11 +219,20 @@ app.post("/api/auth/:username/:password", (req, res) => {
         if (results.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
-        if (results[0].password_hash !== password) {
+       
+        const user = results[0];
+
+        if (user.password_hash !== password) {
             return res.status(404).json({ error: 'invalid login info' });
         }
-        req.session.user = results[0];
-        return res.status(200).send(results);
+
+
+        req.session.user = {
+            user_id: user.user_id,
+            username: user.username
+        };
+        return res.status(200).json({ message: 'Login successful', user: req.session.user });
+
     });
 })
 
