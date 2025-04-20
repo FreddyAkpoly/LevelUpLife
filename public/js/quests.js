@@ -1,22 +1,22 @@
 window.addEventListener("load", () => {
   const date = new Date();
-  let quest_id = new Date().getDate() + 90000;
+  let quest_id = new Date().getDate();
   //let quest_id = 3;
   const formattedDate = date.toDateString();
   let todays_quest_type;
   document.getElementById("time").innerText = formattedDate;
   const pathParts = window.location.pathname.split('/');
-  const userID = pathParts[pathParts.length - 1];
+
 
   document.getElementById("complete_quest").onclick = async function () {
-    if (await get_quest_status(userID, quest_id)) {
+    if (await get_quest_status(quest_id)) {
       console.log("YOU'VE COMPLETED TODAYS QUEST");
     }
     else {
-      const currentStat = await get_current_stat(userID, todays_quest_type);
+      const currentStat = await get_current_stat(todays_quest_type);
       if (currentStat !== null) {
-        complete_quest(userID, todays_quest_type, currentStat + 1);
-        update_complete_quest(userID, quest_id);
+        complete_quest(todays_quest_type, currentStat + 1);
+        update_complete_quest(quest_id);
 
       }
     }
@@ -46,14 +46,13 @@ window.addEventListener("load", () => {
       document.getElementById("mission").innerText = "Failed to load quest";
     });
 
-  const complete_quest = (userId, stat, new_value) => {
-    fetch(`/api/status/${userId}/${stat}/${new_value}`, {
+  const complete_quest = (stat, new_value) => {
+    fetch(`/api/status/${stat}/${new_value}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        userId: userId,
         [stat]: new_value
       })
     })
@@ -107,8 +106,7 @@ window.addEventListener("load", () => {
   };
 
   const update_complete_quest = (quest_id) => {
-    console.log(`Updating quest: userId=${userId}, quest_id=${quest_id}`);
-
+ 
     fetch(`/api/quest_status/complete_quest/${quest_id}`, {
       method: 'PUT',
       headers: {

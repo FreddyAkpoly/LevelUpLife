@@ -11,7 +11,7 @@ app.use(bodyParser.json());
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-app.set("trust proxy", 1); // needed for HTTPS on render
+app.set("trust proxy", 1); 
 
 
 app.use(session({
@@ -50,7 +50,7 @@ connection.connect((err) => {
 
 
 app.get('/quests', (req, res) => {
-    console.log("Full session:", req.session);
+    
     res.sendFile(path.join(__dirname, 'public/html/quests.html'));
 });
 
@@ -76,28 +76,42 @@ app.get('/register', (req, res) => {
 
 
 app.get('/status', (req, res) => {
+    console.log("Full session:", req.session);
     res.sendFile(path.join(__dirname, 'public/html/status.html'));
 });
 
 
 app.get('/api/quests/:questId', (req, res) => {
-    const { questId } = req.params;  // Get questId from the URL parameters
+    let questId = parseInt(req.params.questId); // ensure it's a number
 
-    const query = 'SELECT * FROM quest_list WHERE quest_id = ?';
+    function getQuestById(id, callback) {
+        const query = 'SELECT * FROM quest_list WHERE quest_id = ?';
+        connection.query(query, [id], (err, results) => {
+            if (err) return callback(err, null);
+            if (results.length === 0) return callback(null, null); // no quest found
+            callback(null, results[0]);
+        });
+    }
 
-    connection.query(query, [questId], (err, results) => {
-        if (err) {
-            console.error('Error executing query:', err);
-            return res.status(500).json({ error: 'Database query failed' });
-        }
+    function tryFetchQuest(id) {
+        getQuestById(id, (err, quest) => {
+            if (err) {
+                console.error('Error executing query:', err);
+                return res.status(500).json({ error: 'Database query failed' });
+            }
 
-        if (results.length === 0) {
-            return res.status(404).json({ error: 'Quest not found' });
-        }
+            if (!quest) {
+                // If not found, try next questId
+                return tryFetchQuest(id + 1);
+            }
 
-        res.json(results[0]);  // Return the first (and only) result 
-    });
+            res.json(quest); // Quest found, send it
+        });
+    }
+
+    tryFetchQuest(questId); // Start trying from the initial ID
 });
+
 
 
 app.get('/api/status', (req, res) => {
@@ -119,9 +133,8 @@ app.get('/api/status', (req, res) => {
 
 
 
-app.put('/api/status/:userID/:stat/:new_value', (req, res) => {
+app.put('/api/status/:stat/:new_value', (req, res) => {
 
-    const userId = req.params.userID;
     const stat = req.params.stat;
     const newValue = req.params.new_value;
     console.log("UPDATED VAL " + newValue);
@@ -133,7 +146,7 @@ app.put('/api/status/:userID/:stat/:new_value', (req, res) => {
 
     const query = `UPDATE users SET ${stat} = ? WHERE user_id = ?`;
 
-    connection.query(query, [newValue, userId], (err, results) => {
+    connection.query(query, [newValue, req.session.user.user_id], (err, results) => {
         if (err) {
             console.error('Error executing query:', err);
             return res.status(500).json({ error: 'Database query failed' });
@@ -192,7 +205,7 @@ app.put('/api/quest_status/complete_quest/:questId', (req, res) => {
             return res.status(404).json({ error: 'User or quest not found' });
         }
 
-        res.json({ message: `Quest ${questId} marked as completed for user ${userId}.` });
+        res.json({ message: `Quest ${questId} marked as completed for user.` });
     });
 });
 
