@@ -5,7 +5,10 @@ const bodyParser = require("body-parser");
 const session = require('express-session');
 require('dotenv').config();
 
-let quest_id = new Date().getDate() + parseInt(process.env.OFFSET);
+const quest_id = new Date().getDate() + parseInt(process.env.OFFSET);
+
+let user_id;
+let USER_TEST;
  
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
@@ -21,11 +24,20 @@ app.use(session({
     saveUninitialized: false,
     resave: false,
     cookie: {
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
+        secure: false,
+        sameSite: "lax",
         maxAge: 1000 * 60 * 60 // 1 hour 
     }
 }));
+
+app.use(function(req, res, next) {
+    res.set('credentials', 'include');
+    res.set('Access-Control-Allow-Credentials', true);
+    res.set('Access-Control-Allow-Origin', req.headers.origin);
+    res.set('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.set('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+    next();
+});
 
 
 // const connection = mysql.createConnection({
@@ -67,19 +79,19 @@ pool.query('SELECT * FROM quest_list WHERE quest_id = ?',[quest_id], (err, resul
     if (err) {
         console.error('Error connecting to database:', err);
     } else {
-        console.log(results);
+       // console.log(results);
     }
 }); 
 
 
 app.get('/quests', (req, res) => {
     
-    res.sendFile(path.join(__dirname, 'public/html/quests.html'));
+    res.sendFile(path.join(__dirname, 'public/html/quests.html'));  
 });
 
 app.get('/', (req, res) => {
+    console.log(req.session.user);
     if (req.session.user) {
-        console.log(req.session.user);
         res.sendFile(path.join(__dirname, 'public/html/quests.html'));
     }
     else {
@@ -99,7 +111,7 @@ app.get('/register', (req, res) => {
 
 
 app.get('/status', (req, res) => {
-    console.log("Full session:", req.session);
+   // console.log("Full session:", req.session);
     res.sendFile(path.join(__dirname, 'public/html/status.html'));
 });
 
@@ -138,17 +150,17 @@ app.get('/api/quests', (req, res) => {
 
 app.get('/api/status', (req, res) => {
     // console.log('Session:', req.session.user);
-    if (!req.session.user) {
-        return res.status(401).json({ error: 'User not authenticated' });
-    }
-    console.log('Session:', req.session);
+    // if (!req.session.user) {
+    //     return res.status(401).json({ error});
+    // }
+    //console.log('Session:', req.session);
     const query = 'SELECT * FROM users WHERE user_id = ?';
-    pool.query(query, [req.session.user.user_id], (err, results) => {
+    pool.query(query, [user_id], (err, results) => {
         if (err) {
             console.error('Error executing query:', err);
             return res.status(500).json({ error: 'Database query failed' });
         }
-        console.log(results[0]);
+       // console.log(results[0]);
         res.json(results);
     });
 });
@@ -277,7 +289,8 @@ app.post("/api/auth/:username/:password", (req, res) => {
             user_id: user.user_id,
             username: user.username
         };
-        console.log('Session:', req.session.user);
+        user_id = user.user_id;
+        console.log('Session:', req.sessionID);
         return res.status(200).json({ message: 'Login successful', user: req.session.user });
 
     });
