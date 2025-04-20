@@ -1,6 +1,6 @@
 window.addEventListener("load", () => {
   const date = new Date();
-  let quest_id = new Date().getDate();
+  let quest_id = new Date().getDate() + 90000;
   //let quest_id = 3;
   const formattedDate = date.toDateString();
   let todays_quest_type;
