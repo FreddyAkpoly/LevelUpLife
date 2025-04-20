@@ -211,20 +211,25 @@ app.put('/api/quest_status/complete_quest/:questId', (req, res) => {
 
 
 // ask db for password of user, return if passed in password matches db password
-app.get('/api/login/:username/:password', (req, res) => {
+app.get('/api/login/:username/:password', async (req, res) => {
     const username = req.params.username;
     const password = req.params.password;
     const query = 'SELECT password_hash FROM users WHERE username = ?';
-    connection.query(query, [username], (err, results) => {
-        if (err) {
-            console.error('Error fetching completed quests:', err);
-            return res.status(500).json({ error: 'Database query failed' });
-        }
-        if (results.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        res.json(results[0].password_hash === password);
-    });
+    let connection = await pool.getConnection();
+    try {
+        connection.query(query, [username], (err, results) => {
+            if (err) {
+                console.error('Error fetching completed quests:', err);
+                return res.status(500).json({ error: 'Database query failed' });
+            }
+            if (results.length === 0) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            res.json(results[0].password_hash === password);
+        });
+    } finally {
+        connection.release();
+    }
 });
 
 app.post("/api/auth/:username/:password", (req, res) => {
