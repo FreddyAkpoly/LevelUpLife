@@ -1,7 +1,6 @@
 window.addEventListener("load", () => {
   const date = new Date();
-  let quest_id = new Date().getDate() + 90000;
-  //let quest_id = 3;
+  
   const formattedDate = date.toDateString();
   let todays_quest_type;
   document.getElementById("time").innerText = formattedDate;
@@ -9,15 +8,14 @@ window.addEventListener("load", () => {
 
 
   document.getElementById("complete_quest").onclick = async function () {
-    if (await get_quest_status(quest_id)) {
+    if (await get_quest_status()) {
       console.log("YOU'VE COMPLETED TODAYS QUEST");
     }
     else {
       const currentStat = await get_current_stat(todays_quest_type);
       if (currentStat !== null) {
         complete_quest(todays_quest_type, currentStat + 1);
-        update_complete_quest(quest_id);
-
+        update_complete_quest();
       }
     }
 
@@ -31,7 +29,7 @@ window.addEventListener("load", () => {
   //   window.location.href = `/`;
   // };
 
-  fetch(`/api/quests/${quest_id}`)
+  fetch(`/api/quests`)
     .then(response => response.json())
     .then(data => {
       if (data) {
@@ -85,9 +83,9 @@ window.addEventListener("load", () => {
     }
   };
 
-  const get_quest_status = async (questID) => {
+  const get_quest_status = async () => {
     try {
-      const response = await fetch(`/api/quest_status/${questID}`);
+      const response = await fetch(`/api/quest_status`);
       const data = await response.json();
       const quests = data.completed;
       console.log("Full quest_status object:", quests);
@@ -105,9 +103,9 @@ window.addEventListener("load", () => {
     }
   };
 
-  const update_complete_quest = (quest_id) => {
+  const update_complete_quest = () => {
  
-    fetch(`/api/quest_status/complete_quest/${quest_id}`, {
+    fetch('/api/quest_status/complete_quest', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'

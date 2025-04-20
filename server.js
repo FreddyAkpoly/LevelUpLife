@@ -5,6 +5,8 @@ const bodyParser = require("body-parser");
 const session = require('express-session');
 require('dotenv').config();
 
+let quest_id = new Date().getDate() + parseInt(process.env.OFFSET);
+ 
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
@@ -26,27 +28,48 @@ app.use(session({
 }));
 
 
-const connection = mysql.createConnection({
+// const connection = mysql.createConnection({
+//     host: process.env.DB_HOST,
+//     user: process.env.DB_USER,
+//     password: process.env.DB_PASSWORD,
+//     database: process.env.DB_NAME,
+//     ssl: {
+//         minVersion: 'TLSv1.2',
+//         rejectUnauthorized: false        // necessary for self-signed certs on TiDB Cloud
+//     },
+//     waitForConnections: true,
+//     connectionLimit: 10,
+//     queueLimit: 0
+// });
+
+const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     ssl: {
         minVersion: 'TLSv1.2',
-        rejectUnauthorized: false        // necessary for self-signed certs on TiDB Cloud
+        rejectUnauthorized: false
     },
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
 });
 
-connection.connect((err) => {
+// connection.connect((err) => {
+//     if (err) {
+//         console.error('Error connecting to database:', err);
+//         return;
+//     }
+//     console.log('Connected to MySQL database!');
+// });
+pool.query('SELECT * FROM quest_list WHERE quest_id = ?',[quest_id], (err, results) => {
     if (err) {
         console.error('Error connecting to database:', err);
-        return;
+    } else {
+        console.log(results);
     }
-    console.log('Connected to MySQL database!');
-});
+}); 
 
 
 app.get('/quests', (req, res) => {
@@ -81,12 +104,11 @@ app.get('/status', (req, res) => {
 });
 
 
-app.get('/api/quests/:questId', (req, res) => {
-    let questId = parseInt(req.params.questId); // ensure it's a number
-
+app.get('/api/quests', (req, res) => {
+    
     function getQuestById(id, callback) {
         const query = 'SELECT * FROM quest_list WHERE quest_id = ?';
-        connection.query(query, [id], (err, results) => {
+        pool.query(query, [id], (err, results) => {
             if (err) return callback(err, null);
             if (results.length === 0) return callback(null, null); // no quest found
             callback(null, results[0]);
@@ -109,7 +131,7 @@ app.get('/api/quests/:questId', (req, res) => {
         });
     }
 
-    tryFetchQuest(questId); // Start trying from the initial ID
+    tryFetchQuest(quest_id); // Start trying from the initial ID
 });
 
 
@@ -121,7 +143,7 @@ app.get('/api/status', (req, res) => {
     }
     console.log('Session:', req.session);
     const query = 'SELECT * FROM users WHERE user_id = ?';
-    connection.query(query, [req.session.user.user_id], (err, results) => {
+    pool.query(query, [req.session.user.user_id], (err, results) => {
         if (err) {
             console.error('Error executing query:', err);
             return res.status(500).json({ error: 'Database query failed' });
@@ -146,7 +168,7 @@ app.put('/api/status/:stat/:new_value', (req, res) => {
 
     const query = `UPDATE users SET ${stat} = ? WHERE user_id = ?`;
 
-    connection.query(query, [newValue, req.session.user.user_id], (err, results) => {
+    pool.query(query, [newValue, req.session.user.user_id], (err, results) => {
         if (err) {
             console.error('Error executing query:', err);
             return res.status(500).json({ error: 'Database query failed' });
@@ -160,18 +182,18 @@ app.put('/api/status/:stat/:new_value', (req, res) => {
     });
 });
 
-app.get('/api/quest_status/:questId', (req, res) => {
-    const {questId } = req.params;
+app.get('/api/quest_status', (req, res) => {
+   
 
     const query = `
         SELECT is_completed
         FROM user_quest_status
         WHERE user_id = ? AND quest_id = ?
     `;
-    console.log(questId);
+   
 
 
-    connection.query(query, [req.session.user.user_id, questId], (err, results) => {
+    pool.query(query, [req.session.user.user_id, quest_id], (err, results) => {
         console.log(results);
         if (err) {
             console.error('Error checking quest status:', err);
@@ -186,8 +208,8 @@ app.get('/api/quest_status/:questId', (req, res) => {
     });
 });
 
-app.put('/api/quest_status/complete_quest/:questId', (req, res) => {
-    const {questId } = req.params;
+app.put('/api/quest_status/complete_quest', (req, res) => {
+    
 
     const query = `
         INSERT INTO user_quest_status (user_id, quest_id, is_completed)
@@ -195,7 +217,7 @@ app.put('/api/quest_status/complete_quest/:questId', (req, res) => {
         ON DUPLICATE KEY UPDATE is_completed = true;
     `;
 
-    connection.query(query, [req.session.user.user_id, questId], (err, results) => {
+    pool.query(query, [req.session.user.user_id, quest_id], (err, results) => {
         if (err) {
             console.error('Error updating quest status:', err);
             return res.status(500).json({ error: 'Database update failed' });
@@ -205,7 +227,7 @@ app.put('/api/quest_status/complete_quest/:questId', (req, res) => {
             return res.status(404).json({ error: 'User or quest not found' });
         }
 
-        res.json({ message: `Quest ${questId} marked as completed for user.` });
+        res.json({ message: `Quest ${quest_id} marked as completed for user.` });
     });
 });
 
@@ -215,9 +237,9 @@ app.get('/api/login/:username/:password', async (req, res) => {
     const username = req.params.username;
     const password = req.params.password;
     const query = 'SELECT password_hash FROM users WHERE username = ?';
-    let connection = await pool.getConnection();
-    try {
-        connection.query(query, [username], (err, results) => {
+   
+    
+    pool.query(query, [username], (err, results) => {
             if (err) {
                 console.error('Error fetching completed quests:', err);
                 return res.status(500).json({ error: 'Database query failed' });
@@ -227,9 +249,7 @@ app.get('/api/login/:username/:password', async (req, res) => {
             }
             res.json(results[0].password_hash === password);
         });
-    } finally {
-        connection.release();
-    }
+    
 });
 
 app.post("/api/auth/:username/:password", (req, res) => {
@@ -237,7 +257,7 @@ app.post("/api/auth/:username/:password", (req, res) => {
     const password = req.params.password;
 
     const query = 'SELECT * FROM users WHERE username = ?';
-    connection.query(query, [username], (err, results) => {
+    pool.query(query, [username], (err, results) => {
         if (err) {
             console.error('Error fetching completed quests:', err);
             return res.status(500).json({ error: 'Database query failed' });
@@ -279,7 +299,7 @@ app.put('/api/register/:username/:password', async (req, res) => {
         const id = generateId();
 
         const checkQuery = `SELECT user_id FROM users WHERE user_id = ?`;
-        connection.query(checkQuery, [id], (err, results) => {
+        pool.query(checkQuery, [id], (err, results) => {
             if (err) {
                 console.error('Error checking ID:', err);
                 return res.status(500).json({ error: 'Database error' });
@@ -294,7 +314,7 @@ app.put('/api/register/:username/:password', async (req, res) => {
                     INSERT INTO users (user_id, username, password_hash)
                     VALUES (?, ?, ?)
                 `;
-                connection.query(insertQuery, [id, username, password], (err, results) => {
+                pool.query(insertQuery, [id, username, password], (err, results) => {
                     if (err) {
                         console.error('Error inserting user:', err);
                         return res.status(500).json({ error: 'Insert failed' });
@@ -313,7 +333,7 @@ app.put('/api/register/:username/:password', async (req, res) => {
 app.get('/api/register/:username', (req, res) => {
     const username = req.params.username;
     const query = 'SELECT username FROM users WHERE username = ?';
-    connection.query(query, [username], (err, results) => {
+    pool.query(query, [username], (err, results) => {
         if (err) {
             console.error('Error fetching completed quests:', err);
             return res.status(500).json({ error: 'Database query failed' });
@@ -332,7 +352,7 @@ app.get('/api/login/:username', (req, res) => {
 
     const username = req.params.username;
     const query = 'SELECT user_id FROM users WHERE username = ?';
-    connection.query(query, [username], (err, results) => {
+    pool.query(query, [username], (err, results) => {
         if (err) {
             console.error('Error fetching completed quests:', err);
             return res.status(500).json({ error: 'Database query failed' });
