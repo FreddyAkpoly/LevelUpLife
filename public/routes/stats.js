@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const path = require('path');
 const pool = require('../util/db.js');
-const session = require('express-session');
 router.get('/status', (req, res) => {
     res.sendFile(path.join(__dirname, '../../public/html/status.html'));
 });
@@ -17,6 +16,7 @@ router.get('/api/status', (req, res) => {
         res.json(results);
     });
 });
+
 
 router.put('/api/status/:stat/:new_value', (req, res) => {
 

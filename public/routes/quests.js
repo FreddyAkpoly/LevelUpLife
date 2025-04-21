@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const path = require('path');
 const pool = require('../util/db.js');
-const session = require('express-session');
 const quest_id = new Date().getDate() + parseInt(process.env.OFFSET);
 
 router.get('/', (req, res) => { 

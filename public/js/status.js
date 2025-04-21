@@ -1,6 +1,4 @@
 window.addEventListener("load", () => {
-  const pathParts = window.location.pathname.split('/');
-  const userID = pathParts[pathParts.length - 1];
 
   document.getElementById("view_quests").onclick = async function () {
     window.location.href = `/`;
@@ -26,4 +24,5 @@ window.addEventListener("load", () => {
     .catch(error => {
       console.error("Error fetching user:", error);
     });
+
 });

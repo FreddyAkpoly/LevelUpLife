@@ -12,7 +12,7 @@ window.addEventListener("load", () => {
 
         if (success) {
             createSession(username, password);
-            window.location.href = `/quests`;
+            window.location.href = `/`;
         } else {
         }
     };

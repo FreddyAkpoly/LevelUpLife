@@ -9,10 +9,13 @@ window.addEventListener("load", () => {
 
         const username_available = await check_username(username);
         if (username_available) {
-            const add_user = await register(username, password);
+            const user_created = await register(username, password);
+           if(user_created){
+            window.location.href = `/login`
+           }
         }
         else{
-            console.log("username taken");
+          
         }
     };
 
@@ -23,30 +26,29 @@ window.addEventListener("load", () => {
     }
 
     async function register(username, password) {
-        fetch(`/api/register/${username}/${password}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                username: username,
-                password_hash: password
-            })
-        })
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.json();
-            })
-            .then(data => {
-                console.log('Response data:', data);
-            })
-            .catch(error => {
-                console.error('Error during PUT request:', error);
+        try {
+            const response = await fetch(`/api/register/${username}/${password}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password_hash: password
+                })
             });
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                console.error('Registration failed:', response.statusText);
+                return false;
+            }
+            const data = await response.json();
+            console.log('Response data:', data);
+            return true; 
+        } catch (error) {
+            console.error('Error during PUT request:', error);
+            return false;
+        }
+    }    
 
-    }
-
-    async function get_user_id(username) {
-
-    }
 });

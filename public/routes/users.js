@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const path = require('path');
 const pool = require('../util/db.js');
-const session = require('express-session');
 
 router.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '../../public/html/login.html'));
