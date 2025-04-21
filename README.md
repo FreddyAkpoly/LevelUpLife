@@ -1,77 +1,97 @@
-# 📘 Project: LevelUpLife
+# 🌱 Level Up Life – Gamified Goal Tracker
 
-This is a personal productivity web application inspired by [LevelUpLife](https://leveluplife.onrender.com), which recently went offline. The goal is to recreate and improve upon its core functionality with proper security practices and modern technologies.
-
-## 🛠 Tech Stack
-
-- **Backend**: Node.js, Express
-- **Frontend**: HTML, CSS, JavaScript
-- **Database**: MySQL
+A full-stack web app inspired by [LevelUpLife.com](https://leveluplife.com) that gamifies personal development. Users earn experience points (XP), level up, and track real-life progress through completed tasks and goals.
 
 ---
 
-## 📂 Backend Structure
+## 🚀 Features
 
-### `server.js`
-
-Handles the core server logic and routes.
+- ✅ Account registration and secure session-based login  
+- 📘 Task logging with XP rewards and leveling system  
+- 📊 Real-time dashboard to view XP, level, and progress  
+- 🔐 Session authentication with secure access control  
+- ⚡ Responsive front-end built with vanilla JavaScript, HTML, and CSS  
+- 🌐 RESTful API with structured SQL queries and cloud-based data storage  
 
 ---
 
-## 🔐 User Authentication (To-Do)
+## 🧰 Tech Stack
 
-Currently, user data is retrieved using an `id` parameter in the URL. This is insecure, as anyone can modify the URL to access and modify other users’ data.
+**Frontend:**
+- HTML
+- CSS
+- JavaScript (Vanilla)
 
-### ❌ Current (Insecure) Behavior
+**Backend:**
+- Node.js
+- Express
 
-```js
-// Example: site.com/user/3
-// This URL reveals and modifies user 3's data, regardless of who is logged in.
+**Database:**
+- TiDB Cloud (MySQL-compatible distributed SQL)
+
+**Auth:**
+- Express-session with encrypted cookies
+
+---
+
+## 🗂 Project Structure
+
+```
+/server
+  ├── server.js            # Entry point for backend
+  ├── routes/              # All API routes
+  ├── models/              # SQL queries and logic
+  └── middleware/          # Auth and session control
+
+/public
+  ├── index.html
+  ├── dashboard.html
+  └── styles.css
+
+/scripts
+  └── main.js              # Frontend logic and fetch calls
 ```
 
-### ✅ To-Do: Secure Authentication with Sessions
+---
 
-Implement user sessions so that:
+## 📌 Key Endpoints
 
-- Only logged-in users can access their own data.
-- The server tracks users via sessions, not URL parameters.
+| Method | Endpoint             | Description                        |
+|--------|----------------------|------------------------------------|
+| GET    | `/dashboard`         | Returns user stats & activities    |
+| POST   | `/login`             | Logs user in via session cookies   |
+| POST   | `/register`          | Creates a new user account         |
+| POST   | `/task/complete`     | Awards XP for completed task       |
+| GET    | `/logout`            | Logs out and destroys session      |
 
 ---
 
-## ❓ Understanding `express-session`
+## 🔐 Authentication Flow
 
-```js
-app.use(session({
-    secret: 'your-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false } 
-}));
-```
-
-### Explanation:
-
-| Option             | Description |
-|--------------------|-------------|
-| `secret`           | A string used to sign the session ID cookie. Keep this secret and strong in production. |
-| `resave`           | `false` means session won’t be saved back to the store unless modified. |
-| `saveUninitialized`| `false` means don't create sessions for unauthenticated users. |
-| `cookie.secure`    | If `true`, cookies are only sent over HTTPS. Set to `true` in production with HTTPS. |
+- Session-based login via `express-session`
+- Secure cookies for maintaining login state
+- Protected routes for all dashboard and XP features
 
 ---
 
-## ✅ Best Practice Goals
-
-- Use sessions to track authenticated users.
-- Avoid exposing sensitive data through URLs.
-- Store user IDs and auth states in the session.
+ **Visit:** `http://leveluplife.onrender.com/`
 
 ---
 
-## 📌 Next Steps
+## 🧠 Future Plans
 
-1. Implement login/logout logic with sessions.
-2. Restrict access to user data by session.
-3. Encrypt passwords using `bcrypt`.
+- Add daily/weekly quests
+- Implement achievements and badges
+- Track long-term streaks and milestones
+- Polish UI with a modern front-end framework (React/Vue)
+
+---
+
+## 👤 Author
+
+**Freddy Akpoly**  
+Game Developer → Backend Developer | [LinkedIn](https://www.linkedin.com/in/yourname)  
+Portfolio: _coming soon_  
+Email: _freddy@example.com_
 
 ---

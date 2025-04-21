@@ -25,6 +25,8 @@ window.addEventListener("load", () => {
     window.location.href = `/status`;
   };
 
+  
+
   // document.getElementById("back_to_login").onclick = async function () {
   //   window.location.href = `/`;
   // };
@@ -42,6 +44,20 @@ window.addEventListener("load", () => {
     .catch(error => {
       console.error("Error fetching quest:", error);
       document.getElementById("mission").innerText = "Failed to load quest";
+    });
+
+    fetch(`/api/username`)
+    .then(response => response.json())
+    .then(data => {
+      if (data) {
+        document.getElementById("username").innerText = "Welcome " + data[0].username || "Unnamed user";
+      } else {
+        document.getElementById("mission").innerText = "No username found";
+      }
+    })
+    .catch(error => {
+      console.error("Error fetching username:", error);
+    
     });
 
   const complete_quest = (stat, new_value) => {

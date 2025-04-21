@@ -8,15 +8,14 @@ require('dotenv').config();
 const quest_id = new Date().getDate() + parseInt(process.env.OFFSET);
 
 let user_id;
-let USER_TEST;
- 
+
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-app.set("trust proxy", 1); 
+app.set("trust proxy", 1);
 
 
 app.use(session({
@@ -30,7 +29,7 @@ app.use(session({
     }
 }));
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.set('credentials', 'include');
     res.set('Access-Control-Allow-Credentials', true);
     res.set('Access-Control-Allow-Origin', req.headers.origin);
@@ -75,22 +74,22 @@ const pool = mysql.createPool({
 //     }
 //     console.log('Connected to MySQL database!');
 // });
-pool.query('SELECT * FROM quest_list WHERE quest_id = ?',[quest_id], (err, results) => {
+pool.query('SELECT * FROM quest_list WHERE quest_id = ?', [quest_id], (err, results) => {
     if (err) {
         console.error('Error connecting to database:', err);
     } else {
-       // console.log(results);
+        // console.log(results);
     }
-}); 
+});
 
 
 app.get('/quests', (req, res) => {
-    
-    res.sendFile(path.join(__dirname, 'public/html/quests.html'));  
+
+    res.sendFile(path.join(__dirname, 'public/html/quests.html'));
 });
 
 app.get('/', (req, res) => {
-    console.log(req.session.user);
+    console.log("The user is " + req.session.user);
     if (req.session.user) {
         res.sendFile(path.join(__dirname, 'public/html/quests.html'));
     }
@@ -111,13 +110,13 @@ app.get('/register', (req, res) => {
 
 
 app.get('/status', (req, res) => {
-   // console.log("Full session:", req.session);
+    // console.log("Full session:", req.session);
     res.sendFile(path.join(__dirname, 'public/html/status.html'));
 });
 
 
 app.get('/api/quests', (req, res) => {
-    
+
     function getQuestById(id, callback) {
         const query = 'SELECT * FROM quest_list WHERE quest_id = ?';
         pool.query(query, [id], (err, results) => {
@@ -160,7 +159,20 @@ app.get('/api/status', (req, res) => {
             console.error('Error executing query:', err);
             return res.status(500).json({ error: 'Database query failed' });
         }
-       // console.log(results[0]);
+        // console.log(results[0]);
+        res.json(results);
+    });
+});
+
+app.get('/api/username', (req, res) => {
+
+    const query = 'SELECT username FROM users WHERE user_id = ?';
+    pool.query(query, [user_id], (err, results) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+        // console.log(results[0]);
         res.json(results);
     });
 });
@@ -195,14 +207,14 @@ app.put('/api/status/:stat/:new_value', (req, res) => {
 });
 
 app.get('/api/quest_status', (req, res) => {
-   
+
 
     const query = `
         SELECT is_completed
         FROM user_quest_status
         WHERE user_id = ? AND quest_id = ?
     `;
-   
+
 
 
     pool.query(query, [req.session.user.user_id, quest_id], (err, results) => {
@@ -221,7 +233,7 @@ app.get('/api/quest_status', (req, res) => {
 });
 
 app.put('/api/quest_status/complete_quest', (req, res) => {
-    
+
 
     const query = `
         INSERT INTO user_quest_status (user_id, quest_id, is_completed)
@@ -249,26 +261,8 @@ app.get('/api/login/:username/:password', async (req, res) => {
     const username = req.params.username;
     const password = req.params.password;
     const query = 'SELECT password_hash FROM users WHERE username = ?';
-   
-    
-    pool.query(query, [username], (err, results) => {
-            if (err) {
-                console.error('Error fetching completed quests:', err);
-                return res.status(500).json({ error: 'Database query failed' });
-            }
-            if (results.length === 0) {
-                return res.status(404).json({ error: 'User not found' });
-            }
-            res.json(results[0].password_hash === password);
-        });
-    
-});
 
-app.post("/api/auth/:username/:password", (req, res) => {
-    const username = req.params.username;
-    const password = req.params.password;
 
-    const query = 'SELECT * FROM users WHERE username = ?';
     pool.query(query, [username], (err, results) => {
         if (err) {
             console.error('Error fetching completed quests:', err);
@@ -277,12 +271,32 @@ app.post("/api/auth/:username/:password", (req, res) => {
         if (results.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
-       
+        res.json(results[0].password_hash === password);
+    });
+
+});
+
+app.post("/api/auth/:username/:password", (req, res) => {
+    const username = req.params.username;
+    const password = req.params.password;
+
+    const query = 'SELECT * FROM users WHERE username = ?';
+    //might want to check if you need to remove the session set from the query
+    pool.query(query, [username], (err, results) => {
+        if (err) {
+            console.error('Error fetching completed quests:', err);
+            return res.status(500).json({ error: 'Database query failed' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
         const user = results[0];
 
         if (user.password_hash !== password) {
             return res.status(404).json({ error: 'invalid login info' });
         }
+
 
 
         req.session.user = {
@@ -294,7 +308,17 @@ app.post("/api/auth/:username/:password", (req, res) => {
         return res.status(200).json({ message: 'Login successful', user: req.session.user });
 
     });
+}) 
+
+app.post("/api/auth", (req, res) => {
+    console.log('Session:', req.sessionID);
+    req.session.user = {
+       
+    };
+    return res.status(200).json({ message: 'Login successful', user: req.session.user });
 })
+
+
 
 app.get("/api/auth/status", (req, res) => {
     return req.session.user ? res.status(200).send(req.session.user) : res.status(401).send({ msg: "Not authenticated" });
@@ -376,7 +400,7 @@ app.get('/api/login/:username', (req, res) => {
         console.log(results);
 
         res.json(results[0].user_id);
-    }); 
+    });
 });
 
 
