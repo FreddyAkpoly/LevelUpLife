@@ -4,7 +4,7 @@ window.addEventListener("load", () => {
         const password = document.getElementById("password").value;
 
         if (!username || !password) {
-            return; // Stop execution
+            return;
         }
 
         const username_available = await check_username(username);
