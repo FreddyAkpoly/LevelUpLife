@@ -90,8 +90,5 @@ A full-stack web app inspired by [LevelUpLife.com](https://leveluplife.com) that
 ## 👤 Author
 
 **Freddy Akpoly**  
-Game Developer → Backend Developer | [LinkedIn](https://www.linkedin.com/in/yourname)  
-Portfolio: _coming soon_  
-Email: _freddy@example.com_
-
+Developer  
 ---

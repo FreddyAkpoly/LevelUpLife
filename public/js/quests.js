@@ -25,12 +25,6 @@ window.addEventListener("load", () => {
     window.location.href = `/status`;
   };
 
-  
-
-  // document.getElementById("back_to_login").onclick = async function () {
-  //   window.location.href = `/`;
-  // };
-
   fetch(`/api/quests`)
     .then(response => response.json())
     .then(data => {
