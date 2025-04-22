@@ -4,8 +4,7 @@ window.addEventListener("load", () => {
   const formattedDate = date.toDateString();
   let todays_quest_type;
   document.getElementById("time").innerText = formattedDate;
-  const pathParts = window.location.pathname.split('/');
-
+  
 
   document.getElementById("complete_quest").onclick = async function () {
     if (await get_quest_status()) {
@@ -16,6 +15,7 @@ window.addEventListener("load", () => {
       if (currentStat !== null) {
         complete_quest(todays_quest_type, currentStat + 1);
         update_complete_quest();
+        updateXPBar(10, 300);
       }
     }
 
@@ -132,5 +132,17 @@ window.addEventListener("load", () => {
         console.error('Error during PUT request:', error);
       });
   };
+
+  function updateXPBar(currentXP, maxXP) {
+  const fill = document.querySelector('.xp-bar-fill');
+  const label = document.querySelector('.xp-label');
+  const percent = Math.min((currentXP / maxXP) * 100, 100);
+  
+  fill.style.width = percent + '%';
+  label.textContent = `${currentXP} XP / ${maxXP} XP`;
+}
+
+
+
 
 });

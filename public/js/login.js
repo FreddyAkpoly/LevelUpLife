@@ -5,7 +5,7 @@ window.addEventListener("load", () => {
         const password = document.getElementById("password").value;
 
         if (!username || !password) {
-            return; // Stop execution
+            return; 
         }
 
         const success = await login(username, password);
@@ -18,11 +18,10 @@ window.addEventListener("load", () => {
     };
 
     async function login(username, password) {
-        console.log(`Logging in: username=${username}, password=${password}`);
         try {
             const response = await fetch(`/api/login/${username}/${password}`);
             const data = await response.json();
-            return data === true; // Ensures a strict boolean
+            return data === true; 
         } catch (error) {
             console.error("Login error:", error);
             return false;
