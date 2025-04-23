@@ -33,11 +33,56 @@
 
             <h2>Today's Mission</h2>
 
-            <!-- <p id="mission_type">Mission type</p> -->
             <p id="mission">Mission 1</p>
 
             <button class="nav-btn" id="complete_quest">Complete</button>
             <button class="nav-btn" id="view_status">View Status</button>
+        </div>
+    </div>
+
+    <!-- Status Modal -->
+    <div id="status-modal" class="modal hidden" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Player Status</h2>
+                <button class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="stat">
+                    <span>🎨 Creativity <span class="value" id="Creativity_value">0%</span></span>
+                    <div class="bar">
+                        <div class="fill creativity" id="Creativity_bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <span>❤️ Health <span class="value" id="Health_value">0%</span></span>
+                    <div class="bar">
+                        <div class="fill health" id="Health_bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <span>🍞 Food <span class="value" id="Food_value">0%</span></span>
+                    <div class="bar">
+                        <div class="fill food" id="Food_bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <span>🧠 Mental <span class="value" id="Mental_value">0%</span></span>
+                    <div class="bar">
+                        <div class="fill mental" id="Mental_bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <span>🤝 Social <span class="value" id="Social_value">0%</span></span>
+                    <div class="bar">
+                        <div class="fill social" id="Social_bar" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

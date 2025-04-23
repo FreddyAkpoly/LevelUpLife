@@ -42,8 +42,8 @@ router.put('/api/register/:username/:password', async (req, res) => {
 
     const generateId = () => Math.floor(Math.random() * 1000000);
 
-    const insertUser = () => {
-        const id = generateId();
+    const insertUser = () => { 
+        const id = generateId(); 
 
         const checkQuery = `SELECT user_id FROM users WHERE user_id = ?`;
         pool.query(checkQuery, [id], (err, results) => {

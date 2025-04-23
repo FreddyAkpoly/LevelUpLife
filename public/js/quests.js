@@ -5,6 +5,63 @@ window.addEventListener("load", () => {
   let todays_quest_type;
   document.getElementById("time").innerText = formattedDate;
   
+  // Initialize status modal
+  const statusModal = document.getElementById('status-modal');
+  const viewStatusBtn = document.getElementById('view_status');
+  const closeBtn = document.querySelector('.close-btn');
+
+  // Show status modal
+  viewStatusBtn.addEventListener('click', () => {
+    // First set display to flex
+    statusModal.style.display = 'flex';
+    // Force a reflow to ensure the display change takes effect
+    statusModal.offsetHeight;
+    // Then remove hidden class to trigger animation
+    requestAnimationFrame(() => {
+      statusModal.classList.remove('hidden');
+    });
+    updateStatus();
+  });
+
+  // Close status modal
+  closeBtn.addEventListener('click', () => {
+    statusModal.classList.add('hidden');
+    // Wait for transition to complete before hiding
+    setTimeout(() => {
+      statusModal.style.display = 'none';
+    }, 500); // Match the CSS transition duration
+  });
+
+  // Close modal when clicking outside
+  statusModal.addEventListener('click', (e) => {
+    if (e.target === statusModal) {
+      statusModal.classList.add('hidden');
+      // Wait for transition to complete before hiding
+      setTimeout(() => {
+        statusModal.style.display = 'none';
+      }, 500); // Match the CSS transition duration
+    }
+  });
+
+  // Update status function
+  async function updateStatus() {
+    try {
+      const response = await fetch('/api/status');
+      const data = await response.json();
+      if (data && data.length > 0) {
+        const user = data[0];
+        const stats = ["Creativity", "Health", "Food", "Mental", "Social"];
+        
+        stats.forEach(stat => {
+          const value = user[stat];
+          document.getElementById(`${stat}_value`).textContent = `${value}%`;
+          document.getElementById(`${stat}_bar`).style.width = `${value}%`;
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching status:", error);
+    }
+  }
 
   document.getElementById("complete_quest").onclick = async function () {
     if (await get_quest_status()) {
@@ -16,13 +73,17 @@ window.addEventListener("load", () => {
         complete_quest(todays_quest_type, currentStat + 1);
         update_complete_quest();
         updateXPBar(10, 300);
+        // Update status if modal is visible
+        if (!statusModal.classList.contains('hidden')) {
+          updateStatus();
+        }
       }
     }
-
   };
 
   document.getElementById("view_status").onclick = async function () {
-    window.location.href = `/status`;
+    statusModal.classList.remove('hidden');
+    updateStatus();
   };
 
   fetch(`/api/quests`)
