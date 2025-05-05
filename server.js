@@ -6,12 +6,13 @@ require('dotenv').config();
 const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.json());
+app.set('trust proxy', 1);
 app.use(session({
     secret: process.env.SECRET,
     saveUninitialized: false,
     resave: false,
     cookie: {
-        secure: false,
+        secure: true,
         sameSite: "lax",
         maxAge: 1000 * 60 * 60
     }
