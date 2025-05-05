@@ -72,7 +72,7 @@ window.addEventListener("load", () => {
       if (currentStat !== null) {
         complete_quest(todays_quest_type, currentStat + 1);
         update_complete_quest();
-        updateXPBar(10, 300);
+        //updateXPBar(10, 300);
         // Update status if modal is visible
         if (!statusModal.classList.contains('hidden')) {
           updateStatus();
@@ -194,14 +194,14 @@ window.addEventListener("load", () => {
       });
   };
 
-  function updateXPBar(currentXP, maxXP) {
-  const fill = document.querySelector('.xp-bar-fill');
-  const label = document.querySelector('.xp-label');
-  const percent = Math.min((currentXP / maxXP) * 100, 100);
+//   function updateXPBar(currentXP, maxXP) {
+//   const fill = document.querySelector('.xp-bar-fill');
+//   const label = document.querySelector('.xp-label');
+//   const percent = Math.min((currentXP / maxXP) * 100, 100);
   
-  fill.style.width = percent + '%';
-  label.textContent = `${currentXP} XP / ${maxXP} XP`;
-}
+//   fill.style.width = percent + '%';
+//   label.textContent = `${currentXP} XP / ${maxXP} XP`;
+// }
 
 
 

@@ -5,6 +5,7 @@ const pool = require('../util/db.js');
 const quest_id = new Date().getDate() + parseInt(process.env.OFFSET);
 
 router.get('/', (req, res) => { 
+
     if (req.session.user) {
         res.sendFile(path.join(__dirname, '../../public/html/quests.html'));
     }
