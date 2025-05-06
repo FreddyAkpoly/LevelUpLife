@@ -1,14 +1,17 @@
 window.addEventListener("load", () => {
   const date = new Date();
-  
+
   const formattedDate = date.toDateString();
   let todays_quest_type;
   document.getElementById("time").innerText = formattedDate;
-  
+
   // Initialize status modal
   const statusModal = document.getElementById('status-modal');
+  const notificationModal = document.getElementById('notification-modal');
+
   const viewStatusBtn = document.getElementById('view_status');
   const closeBtn = document.querySelector('.close-btn');
+  const notificationCloseBtn = document.querySelector('.notification-close-btn');
 
   // Show status modal
   viewStatusBtn.addEventListener('click', () => {
@@ -32,6 +35,15 @@ window.addEventListener("load", () => {
     }, 500); // Match the CSS transition duration
   });
 
+    // Close status modal
+    notificationCloseBtn.addEventListener('click', () => {
+      notificationModal.classList.add('hidden');
+      // Wait for transition to complete before hiding
+      setTimeout(() => {
+        notificationModal.style.display = 'none';
+      }, 500); // Match the CSS transition duration
+    });
+
   // Close modal when clicking outside
   statusModal.addEventListener('click', (e) => {
     if (e.target === statusModal) {
@@ -39,6 +51,16 @@ window.addEventListener("load", () => {
       // Wait for transition to complete before hiding
       setTimeout(() => {
         statusModal.style.display = 'none';
+      }, 500); // Match the CSS transition duration
+    }
+  });
+
+  notificationModal.addEventListener('click', (e) => {
+    if (e.target === notificationModal) {
+      notificationModal.classList.add('hidden');
+      // Wait for transition to complete before hiding
+      setTimeout(() => {
+        notificationModal.style.display = 'none';
       }, 500); // Match the CSS transition duration
     }
   });
@@ -51,7 +73,7 @@ window.addEventListener("load", () => {
       if (data && data.length > 0) {
         const user = data[0];
         const stats = ["Creativity", "Health", "Food", "Mental", "Social"];
-        
+
         stats.forEach(stat => {
           const value = user[stat];
           document.getElementById(`${stat}_value`).textContent = `${value}%`;
@@ -63,23 +85,47 @@ window.addEventListener("load", () => {
     }
   }
 
+  setTimeout(() => {
+    notificationModal.classList.add('hidden');
+    setTimeout(() => {
+      notificationModal.style.display = 'none';
+    }, 300); // Allow time for transition if you have one
+  }, 3000); // Closes after 3 seconds (3000ms)
+  
+
   document.getElementById("complete_quest").onclick = async function () {
+    const modalBody = document.querySelector("#notification-modal .modal-body");
+  
     if (await get_quest_status()) {
-      console.log("YOU'VE COMPLETED TODAYS QUEST");
-    }
-    else {
+      modalBody.textContent = "You've already completed today's quest.";
+    } else {
       const currentStat = await get_current_stat(todays_quest_type);
       if (currentStat !== null) {
         complete_quest(todays_quest_type, currentStat + 1);
         update_complete_quest();
-        //updateXPBar(10, 300);
-        // Update status if modal is visible
         if (!statusModal.classList.contains('hidden')) {
           updateStatus();
         }
       }
+      modalBody.textContent = "You've completed today's quest!";
     }
+  
+    notificationModal.style.display = 'flex';
+    notificationModal.offsetHeight;
+    requestAnimationFrame(() => {
+      notificationModal.classList.remove('hidden');
+    });
+  
+    // Auto-close after 3 seconds
+    setTimeout(() => {
+      notificationModal.classList.add('hidden');
+      setTimeout(() => {
+        notificationModal.style.display = 'none';
+      }, 300); // delay allows transition to complete if present
+    }, 3000);
   };
+  
+  
 
   document.getElementById("view_status").onclick = async function () {
     statusModal.classList.remove('hidden');
@@ -101,7 +147,7 @@ window.addEventListener("load", () => {
       document.getElementById("mission").innerText = "Failed to load quest";
     });
 
-    fetch(`/api/username`)
+  fetch(`/api/username`)
     .then(response => response.json())
     .then(data => {
       if (data) {
@@ -112,7 +158,7 @@ window.addEventListener("load", () => {
     })
     .catch(error => {
       console.error("Error fetching username:", error);
-    
+
     });
 
   const complete_quest = (stat, new_value) => {
@@ -175,7 +221,7 @@ window.addEventListener("load", () => {
   };
 
   const update_complete_quest = () => {
- 
+
     fetch('/api/quest_status/complete_quest', {
       method: 'PUT',
       headers: {
@@ -194,14 +240,14 @@ window.addEventListener("load", () => {
       });
   };
 
-//   function updateXPBar(currentXP, maxXP) {
-//   const fill = document.querySelector('.xp-bar-fill');
-//   const label = document.querySelector('.xp-label');
-//   const percent = Math.min((currentXP / maxXP) * 100, 100);
-  
-//   fill.style.width = percent + '%';
-//   label.textContent = `${currentXP} XP / ${maxXP} XP`;
-// }
+  //   function updateXPBar(currentXP, maxXP) {
+  //   const fill = document.querySelector('.xp-bar-fill');
+  //   const label = document.querySelector('.xp-label');
+  //   const percent = Math.min((currentXP / maxXP) * 100, 100);
+
+  //   fill.style.width = percent + '%';
+  //   label.textContent = `${currentXP} XP / ${maxXP} XP`;
+  // }
 
 
 
