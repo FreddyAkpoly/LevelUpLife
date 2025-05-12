@@ -17,20 +17,23 @@ A full-stack web app inspired by [LevelUpLife.com](https://realityquest-4dc7abda
 
 ## 🧰 Tech Stack
 
-**Frontend:**
-- HTML
-- CSS
-- JavaScript (Vanilla)
+## 🖥️ Frontend
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
 
-**Backend:**
-- Node.js
-- Express
+## ⚙️ Backend
+![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-grey?logoColor=white)
 
-**Database:**
-- TiDB Cloud (MySQL-compatible distributed SQL)
 
-**Auth:**
-- Express-session with encrypted cookies
+## 🗄️ Database
+![TiDB](https://img.shields.io/badge/TiDB-FF3E00?logo=mysql&logoColor=white) *(MySQL-compatible)*
+
+## 🔐 Auth
+![Express Session](https://img.shields.io/badge/express--session-000000?logo=express&logoColor=white)
+![Cookies](https://img.shields.io/badge/Encrypted%20Cookies-8A2BE2?logo=cookiecutter&logoColor=white)
+
 
 ---
 
