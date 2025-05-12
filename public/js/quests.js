@@ -95,8 +95,9 @@ window.addEventListener("load", () => {
 
   document.getElementById("complete_quest").onclick = async function () {
     const modalBody = document.querySelector("#notification-modal .modal-body");
+    const quest_status = await get_quest_status();
   
-    if (await get_quest_status()) {
+    if (quest_status) {
       modalBody.textContent = "You've already completed today's quest.";
     } else {
       const currentStat = await get_current_stat(todays_quest_type);
@@ -109,6 +110,8 @@ window.addEventListener("load", () => {
       }
       modalBody.textContent = "You've completed today's quest!";
     }
+
+   
   
     notificationModal.style.display = 'flex';
     notificationModal.offsetHeight;
