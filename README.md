@@ -1,6 +1,6 @@
 # 🌱 Reality Quest – Gamified Goal Tracker
 
-A full-stack web app [RealityQuest]([https://realityquest-4dc7abdad920.herokuapp.com](https://leveluplife.onrender.com)]) that gamifies personal development. Users earn experience points (XP), level up, and track real-life progress through completed tasks and goals.
+A full-stack web app [RealityQuest]([https://realityquest-4dc7abdad920.herokuapp.com](https://leveluplife.onrender.com])) that gamifies personal development. Users earn experience points (XP), level up, and track real-life progress through completed tasks and goals.
 
 ---
 
